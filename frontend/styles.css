@@ -1,0 +1,77 @@
+:root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface-hover: #252525;
+    --border: #333;
+    --text: #e0e0e0;
+    --text-muted: #888;
+    --available: #2a2a2a;
+    --available-hover: #3a3a3a;
+    --held-mine: #d4a017;
+    --held-other: #e06c00;
+    --confirmed: #c0392b;
+    --accent: #4fc3f7;
+    --danger: #e74c3c;
+    --font: 'SF Mono';
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font), serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.seat {
+    width: 36px;
+    height: 32px;
+    border-radius: 6px 6px 3px 3px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.65rem;
+    font-family: var(--font), serif;
+    color: var(--text-muted);
+    background: var(--available);
+    transition: background 0.2s,
+    transform 0.15s;
+}
+
+.seat:hover:not(.seat--held-other):not(.seat--confirmed) {
+    background: var(--available-hover);
+    transform: scale(1.08);
+}
+
+.seat--held-other {
+    background: var(--held-other);
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.seat--confirmed {
+    background: var(--confirmed);
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.btn {
+    flex: 1;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font), serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.85;
+}
