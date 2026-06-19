@@ -1,7 +1,8 @@
 import { Movie, SeatStatus } from '@/types/cinema.ts';
 
 const request = async <T>(method: string, path: string, body?: unknown): Promise<T> => {
-  const response = await fetch(path, {
+  // TODO: Fix API URL override
+  const response = await fetch(`http://localhost:3000/${path}`, {
     method,
     headers: {
       'Content-Type': 'application/json',
@@ -19,15 +20,6 @@ const request = async <T>(method: string, path: string, body?: unknown): Promise
 };
 
 export const cinemaApi = {
-  getMovies: () => request<Movie[]>('GET', '/movies'),
-
-  getSeats: (movieId: string) => request<SeatStatus[]>('GET', `/movies/${movieId}/seats`),
-
-  holdSeat: (movieId: string, seatId: string, userId: string) =>
-    request('POST', `/movies/${movieId}/seats/${seatId}/hold`, { user_id: userId }),
-
-  confirmSeat: (sessionId: string, userId: string) =>
-    request('PUT', `/sessions/${sessionId}/confirm`, { user_id: userId }),
-
-  releaseSeat: (sessionId: string, userId: string) => request('DELETE', `/sessions/${sessionId}`, { user_id: userId }),
+  getMovies: () => request<Movie[]>('GET', `movies`),
+  getSeats: (movieId: string) => request<SeatStatus[]>('GET', `movies/${movieId}/seats`),
 };

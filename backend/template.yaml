@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cinema Booking
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [ dev ]
+  DBHost:
+    Type: String
+  DBPassword:
+    Type: String
+    NoEcho: true
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 10
+    MemorySize: 256
+    Environment:
+      Variables:
+        DB_HOST: !Ref DBHost
+        DB_NAME: postgres
+        DB_USER: postgres
+        DB_PASSWORD: !Ref DBPassword
+        DB_PORT: '5432'
+        ENVIRONMENT: !Ref Environment
+
+Resources:
+  BookingApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'" # TODO, domain
+
+  ListMoviesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/functions/movies/list.handler
+      CodeUri: .
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource:
+                - !Sub 'arn:aws:rds-db:${AWS::Region}:${AWS::AccountId}:dbuser:*/nodejs_iam_user'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /movies
+            Method: GET
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${BookingApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
