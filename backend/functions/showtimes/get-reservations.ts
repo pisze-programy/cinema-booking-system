@@ -3,7 +3,7 @@ import {dbService} from "@/database/client";
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
     try {
-        const showtimeId = event.queryStringParameters?.showtimeId;
+        const showtimeId = event.pathParameters?.id;
         if (!showtimeId) {
             return {
                 statusCode: 400,
@@ -14,21 +14,18 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 
         const pool = await dbService.getPool();
 
-        const {rows} = await pool.query<any>(
-            `SELECT st.id  AS "showtimeId",
-                    r.name AS "roomName",
-                    r.layout
-             FROM showtimes st
-                      JOIN movies m ON st.movie_id = m.id
-                      JOIN rooms r ON st.room_id = r.id
-             WHERE st.id = $1`,
+        const {rows} = await pool.query(
+            `SELECT row_id, seat_num
+             FROM reservations
+             WHERE showtime_id = $1
+               AND (status = 'CONFIRMED' OR (status = 'PENDING' AND expires_at > NOW()));`,
             [showtimeId]
         );
 
         return {
             statusCode: 200,
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(rows),
+            body: JSON.stringify(rows[0]),
         };
     } catch (error) {
         console.error(error);

@@ -21,7 +21,6 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
                     m.poster_url AS "posterUrl",
                     st.id        AS "showtimeId",
                     st.room_id   AS "roomId",
-                    st.room_name AS "roomName",
                     st.start_at  AS "startAt"
              FROM movies m
                       JOIN showtimes st ON m.id = st.movie_id
@@ -29,6 +28,10 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
              ORDER BY st.start_at`,
             [date]
         );
+
+        if (rows.length === 0) {
+            return {statusCode: 404, body: JSON.stringify({error: "Movies not found"})};
+        }
 
         return {
             statusCode: 200,

@@ -1,12 +1,12 @@
 import { useMoviesList } from "./hooks/useMoviesList.ts"
 import { MovieList } from "@/components/Movie/List.tsx"
 import { useSeatsForMovie } from "@/hooks/useSeatsForMovie.ts"
-import { Grid } from "@/components/Seats/Grid.tsx"
 import { useEffect } from "react"
+import { RoomLayout } from "@/components/Movie/RoomLayout.tsx"
 
 export default function App() {
   const { movies, loading: loadingMoviesData } = useMoviesList()
-  const { seats, loading: loadingSeatsData, onSelectShowtime, selectedShowtimeId } = useSeatsForMovie()
+  const { seats, loading: loadingSeatsData, onSelectShowtime, selectedShowtimeId, onSelectSeat } = useSeatsForMovie()
 
   useEffect(() => {
     if (loadingMoviesData) {
@@ -21,7 +21,7 @@ export default function App() {
         <p>Date: 20.06.2026</p>
       </header>
 
-      <div className="cinema-page">
+      <div>
         {loadingMoviesData ? (
           <p>Loading movies data...</p>
         ) : (
@@ -30,7 +30,9 @@ export default function App() {
 
         {selectedShowtimeId && loadingSeatsData && <p>Loading seats data...</p>}
 
-        {selectedShowtimeId && seats.length && <Grid seats={seats} />}
+        {selectedShowtimeId && !loadingSeatsData && seats && (
+          <RoomLayout roomName={seats.roomName} rows={seats.rows} onSelectSeat={onSelectSeat} />
+        )}
       </div>
     </div>
   )

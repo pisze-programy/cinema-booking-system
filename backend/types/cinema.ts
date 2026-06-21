@@ -1,22 +1,26 @@
+import {ReservationStatus} from "@/types/reservation";
+
 export interface Movie {
     id: string
     title: string
     posterUrl: string
 }
 
-export interface Room {
+export interface Seat {
     id: string
-    name: string
-    rows: {
-        id: string
-        name: string
-        seats: number[]
-    }[]
+    number: number
+    status: ReservationStatus
 }
 
-export interface Showtime {
+export interface Row {
     id: string
-    movieId: string
-    roomId: string
-    startAt: string
+    name: string
+    seats: Seat[]
+}
+
+export interface ShowtimeSeats {
+    showtimeId: string
+    movieTitle: string
+    roomName: string
+    rows: Row[]
 }

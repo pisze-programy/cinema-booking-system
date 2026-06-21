@@ -37,10 +37,10 @@ Resources:
         AllowHeaders: "'Content-Type'"
         AllowOrigin: "'*'" # TODO, domain
 
-  ListMoviesFunction:
+  GetListMoviesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: dist/functions/movies/list.handler
+      Handler: dist/functions/movies/get-movies.handler
       CodeUri: .
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -52,10 +52,10 @@ Resources:
             Path: /movies
             Method: GET
 
-  SeatsFunction:
+  GetShowtimeSeatsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: dist/functions/movies/seats.handler
+      Handler: dist/functions/showtimes/get-seats.handler
       CodeUri: .
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -64,7 +64,22 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref BookingApi
-            Path: /seats
+            Path: /showtimes/{id}/seats
+            Method: GET
+
+  GetShowtimeReservationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/functions/movies/get-reservations.handler
+      CodeUri: .
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        SeatsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /showtimes/{id}/reservations
             Method: GET
 
 Outputs:

@@ -7,3 +7,15 @@ export interface MovieListResponse {
   roomName: string
   startAt: string
 }
+
+export interface RoomRow {
+  id: string
+  name: string
+  seats: number[]
+}
+
+export interface ShowtimeSeatsResponse {
+  showtimeId: string
+  roomName: string
+  rows: RoomRow[]
+}

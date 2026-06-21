@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react"
-import { SeatStatus } from "@/types/cinema"
 import { cinemaApi } from "@/utils/api"
+import { ShowtimeSeatsResponse } from "@/types/apiResponse.ts"
 
 export const useSeatsForMovie = () => {
-  const [seats, setSeats] = useState<SeatStatus[]>([])
+  const [seats, setSeats] = useState<ShowtimeSeatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedShowtimeId, setSelectedShowtimeId] = useState<string | null>(null)
+
+  const onSelectSeat = () => {
+    //
+  }
 
   const onSelectShowtime = (id: string | null) => {
     setSelectedShowtimeId(id)
   }
 
-  const onMovieSelect = async (showtimeId: string) => {
+  const onShowtimeSelected = async (showtimeId: string) => {
     setLoading(true)
 
     try {
@@ -19,15 +23,17 @@ export const useSeatsForMovie = () => {
       setSeats(seats)
     } catch (e) {
       console.log("Error getSeats Response:", e)
-      setSeats([])
+      setSeats(null)
     } finally {
       setLoading(false)
     }
+
+    // const reservations = await cinemaApi.getSeatsReservations(showtimeId)
   }
 
   useEffect(() => {
     if (!selectedShowtimeId) return
-    onMovieSelect(selectedShowtimeId)
+    onShowtimeSelected(selectedShowtimeId)
   }, [selectedShowtimeId])
 
   return {
@@ -35,5 +41,6 @@ export const useSeatsForMovie = () => {
     loading,
     onSelectShowtime,
     selectedShowtimeId,
+    onSelectSeat,
   }
 }
