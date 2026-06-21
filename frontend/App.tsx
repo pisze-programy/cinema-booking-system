@@ -4,6 +4,7 @@ import { useSeatsForMovie } from "@/hooks/useSeatsForMovie.ts"
 import { useEffect } from "react"
 import { RoomLayout } from "@/components/Movie/RoomLayout.tsx"
 import { RoomLayoutSkeleton } from "@/components/Movie/RoomLayoutSkeleton.tsx"
+import { MovieListSkeleton } from "@/components/Movie/MovieListSkeleton.tsx"
 
 export default function App() {
   const { movies, loading: loadingMoviesData } = useMoviesList()
@@ -23,7 +24,7 @@ export default function App() {
 
       <div>
         {loadingMoviesData ? (
-          <p>Loading movies data...</p>
+          <MovieListSkeleton cardsNum={3} />
         ) : (
           <MovieList movies={movies} onSelectShowtime={onSelectShowtime} />
         )}
