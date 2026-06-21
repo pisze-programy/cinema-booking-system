@@ -1,32 +1,39 @@
-import { useEffect, useState } from 'react';
-import { Movie, SeatStatus } from '@/types/cinema';
-import { cinemaApi } from '@/utils/api';
+import { useEffect, useState } from "react"
+import { SeatStatus } from "@/types/cinema"
+import { cinemaApi } from "@/utils/api"
 
-export const useSeatsForMovie = (selectedMovie: Movie | null) => {
-  const [seats, setSeats] = useState<SeatStatus[]>([]);
-  const [loading, setLoading] = useState(true);
+export const useSeatsForMovie = () => {
+  const [seats, setSeats] = useState<SeatStatus[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedShowtimeId, setSelectedShowtimeId] = useState<string | null>(null)
 
-  const onMovieSelect = async (movie: Movie) => {
-    setLoading(true);
+  const onSelectShowtime = (id: string | null) => {
+    setSelectedShowtimeId(id)
+  }
+
+  const onMovieSelect = async (showtimeId: string) => {
+    setLoading(true)
 
     try {
-      const seats = await cinemaApi.getSeats(movie.id);
-      setSeats(seats);
+      const seats = await cinemaApi.getSeats(showtimeId)
+      setSeats(seats)
     } catch (e) {
-      console.log('Error getSeats', e);
-      setSeats([]);
+      console.log("Error getSeats Response:", e)
+      setSeats([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    if (!selectedMovie) return;
-    onMovieSelect(selectedMovie);
-  }, [selectedMovie]);
+    if (!selectedShowtimeId) return
+    onMovieSelect(selectedShowtimeId)
+  }, [selectedShowtimeId])
 
   return {
     seats,
     loading,
-  };
-};
+    onSelectShowtime,
+    selectedShowtimeId,
+  }
+}

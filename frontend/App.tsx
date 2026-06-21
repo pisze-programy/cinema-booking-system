@@ -1,33 +1,42 @@
-import { useMoviesList } from './hooks/useMoviesList.ts';
-import { Grid } from '@/components/Seats/Grid.tsx';
-import { MovieList } from '@/components/Movie/List.tsx';
-import { useSeatsForMovie } from '@/hooks/useSeatsForMovie.ts';
-import { useState } from 'react';
-import { Movie } from '@/types/cinema.ts';
+import { useMoviesList } from "./hooks/useMoviesList.ts"
+import { MovieList } from "@/components/Movie/List.tsx"
+import { useSeatsForMovie } from "@/hooks/useSeatsForMovie.ts"
+import { Grid } from "@/components/Seats/Grid.tsx"
+import { useEffect } from "react"
 
 export default function App() {
-  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const { movies, loading: loadingMoviesData } = useMoviesList()
+  const { seats, loading: loadingSeatsData, onSelectShowtime, selectedShowtimeId } = useSeatsForMovie()
 
-  const { movies, loading: loadingMoviesData } = useMoviesList();
-  const { seats, loading: loadingSeatsData } = useSeatsForMovie(selectedMovie);
+  useEffect(() => {
+    if (loadingMoviesData) {
+      onSelectShowtime(null)
+    }
+  }, [loadingMoviesData])
 
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto', padding: '2rem' }}>
-      <header style={{ marginBottom: '2rem' }}>
+    <div style={styles.container}>
+      <header style={styles.header}>
         <h1>Event Booking</h1>
+        <p>Date: 20.06.2026</p>
       </header>
 
       <div className="cinema-page">
         {loadingMoviesData ? (
           <p>Loading movies data...</p>
         ) : (
-          <MovieList movies={movies} selectedMovieId={selectedMovie?.id} onSelect={setSelectedMovie} />
+          <MovieList movies={movies} onSelectShowtime={onSelectShowtime} />
         )}
 
-        {selectedMovie?.id && loadingSeatsData && <p>Loading seats data...</p>}
+        {selectedShowtimeId && loadingSeatsData && <p>Loading seats data...</p>}
 
-        {selectedMovie?.id && seats.length && <Grid movie={selectedMovie} seats={seats} />}
+        {selectedShowtimeId && seats.length && <Grid seats={seats} />}
       </div>
     </div>
-  );
+  )
+}
+
+const styles = {
+  container: { maxWidth: 960, margin: "0 auto", padding: "2rem" },
+  header: { marginBottom: "2rem" },
 }

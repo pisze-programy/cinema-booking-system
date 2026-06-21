@@ -6,7 +6,7 @@ class DatabaseService {
     private tokenExpiry: number = 0
     private cachedToken: string | null = null
 
-    private readonly isDev = process.env.ENVIRONMENT === "dev"
+    private readonly isLocal = process.env.AWS_SAM_LOCAL === "true"
     private readonly host = process.env.DB_HOST!
     private readonly db_port = process.env.DB_PORT!
     private readonly database = process.env.DB_NAME!
@@ -51,7 +51,7 @@ class DatabaseService {
     }
 
     private async getPassword(): Promise<string> {
-        if (!this.isDev) {
+        if (this.isLocal) {
             return process.env.DB_PASSWORD!
         }
 

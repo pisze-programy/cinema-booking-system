@@ -1,33 +1,28 @@
 import {APIGatewayProxyEventV2, APIGatewayProxyResultV2} from 'aws-lambda';
 import {dbService} from "@/database/client";
-import {Movie} from "@/types/cinema";
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
     try {
-        const date = event.queryStringParameters?.date;
-        if (!date) {
+        const showtimeId = event.queryStringParameters?.showtimeId;
+        if (!showtimeId) {
             return {
                 statusCode: 400,
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: 'Missing required date'}),
+                body: JSON.stringify({message: 'Missing required showtimeId'}),
             };
         }
 
         const pool = await dbService.getPool();
 
-        const {rows} = await pool.query<Movie>(
-            `SELECT m.id,
-                    m.title,
-                    m.poster_url AS "posterUrl",
-                    st.id        AS "showtimeId",
-                    st.room_id   AS "roomId",
-                    st.room_name AS "roomName",
-                    st.start_at  AS "startAt"
-             FROM movies m
-                      JOIN showtimes st ON m.id = st.movie_id
-             WHERE st.start_at::date = $1:: date
-             ORDER BY st.start_at`,
-            [date]
+        const {rows} = await pool.query<any>(
+            `SELECT st.id  AS "showtimeId",
+                    r.name AS "roomName",
+                    r.layout
+             FROM showtimes st
+                      JOIN movies m ON st.movie_id = m.id
+                      JOIN rooms r ON st.room_id = r.id
+             WHERE st.id = $1`,
+            [showtimeId]
         );
 
         return {

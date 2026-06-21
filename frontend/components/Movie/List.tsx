@@ -1,18 +1,26 @@
-import type { Movie } from '@/types/cinema';
-import { Card } from './Card';
+import type { Movie } from "@/types/cinema"
+import { Card } from "./Card"
+import { CSSProperties } from "react"
 
 interface MovieListProps {
-  movies: Movie[];
-  selectedMovieId?: string;
-  onSelect: (movie: Movie) => void;
+  movies: Movie[]
+  onSelectShowtime: (id: string) => void
 }
 
-export const MovieList = ({ movies, selectedMovieId, onSelect }: MovieListProps) => {
+export const MovieList = ({ movies, onSelectShowtime }: MovieListProps) => {
   return (
-    <div className="movies">
+    <div style={styles.movies}>
       {movies.map((movie) => (
-        <Card key={movie.id} movie={movie} selected={selectedMovieId === movie.id} onSelect={onSelect} />
+        <Card key={movie.id} movie={movie} onSelectShowtime={onSelectShowtime} />
       ))}
     </div>
-  );
-};
+  )
+}
+
+const styles: Record<string, CSSProperties> = {
+  movies: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+}

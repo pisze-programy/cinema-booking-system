@@ -1,41 +1,38 @@
-import { Movie, SeatStatus } from '@/types/cinema';
-import { Seat } from './Seat';
+import { SeatStatus } from "@/types/cinema"
 
 interface Props {
-  movie: Movie;
-  seats: SeatStatus[];
+  seats: SeatStatus[]
 }
 
-export const Grid = ({ movie, seats }: Props) => {
-  const _rows = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const seatMap = new Map(seats.map((s) => [s.seat_id, s]));
-  const rows = new Array(movie.rows);
+export const Grid = ({}: Props) => {
+  // const seatMap = new Map(seats.map((s) => [s.seat_id, s]))
+  // const rows = new Array(movie.rows)
 
   const onSeatClick = (seatId: string) => {
-    console.log('Seat', seatId);
-  };
+    console.log("Seat", seatId)
+  }
 
   return (
     <div className="seat-grid">
-      {rows.map((_, rowIndex) => {
-        const rowLetter = _rows[rowIndex];
+      {/*{rows.map((_, rowIndex) => {*/}
+      {/*  const rowLetter = _rows[rowIndex]*/}
 
-        return (
-          <div key={rowLetter} className="seat-row">
-            {seats.map((_, seatNumber) => {
-              const seatId = `${rowLetter}${seatNumber + 1}`;
+      {/*  return (*/}
+      {/*    <div key={rowLetter} className="seat-row">*/}
+      {/*      {seats.map((_, seatNumber) => {*/}
+      {/*        const seatId = `${rowLetter}${seatNumber + 1}`*/}
 
-              const seat = seatMap.get(seatId) ?? {
-                seat_id: seatId,
-                booked: false,
-                confirmed: false,
-              };
+      {/*        const seat = seatMap.get(seatId) ?? {*/}
+      {/*          seat_id: seatId,*/}
+      {/*          booked: false,*/}
+      {/*          confirmed: false,*/}
+      {/*        }*/}
 
-              return <Seat key={seatId} seat={seat} onClick={() => onSeatClick(seatId)} />;
-            })}
-          </div>
-        );
-      })}
+      {/*        return <Seat key={seatId} seat={seat} onClick={() => onSeatClick(seatId)} />*/}
+      {/*      })}*/}
+      {/*    </div>*/}
+      {/*  )*/}
+      {/*})}*/}
     </div>
-  );
-};
+  )
+}

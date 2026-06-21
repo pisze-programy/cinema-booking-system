@@ -43,18 +43,28 @@ Resources:
       Handler: dist/functions/movies/list.handler
       CodeUri: .
       Policies:
-        - Statement:
-            - Effect: Allow
-              Action:
-                - rds-db:connect
-              Resource:
-                - !Sub 'arn:aws:rds-db:${AWS::Region}:${AWS::AccountId}:dbuser:*/nodejs_iam_user'
+        - AWSLambdaBasicExecutionRole
       Events:
-        Api:
+        ListMoviesApi:
           Type: Api
           Properties:
             RestApiId: !Ref BookingApi
             Path: /movies
+            Method: GET
+
+  SeatsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/functions/movies/seats.handler
+      CodeUri: .
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        SeatsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /seats
             Method: GET
 
 Outputs:
