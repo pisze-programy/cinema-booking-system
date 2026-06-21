@@ -3,6 +3,7 @@ import { MovieList } from "@/components/Movie/List.tsx"
 import { useSeatsForMovie } from "@/hooks/useSeatsForMovie.ts"
 import { useEffect } from "react"
 import { RoomLayout } from "@/components/Movie/RoomLayout.tsx"
+import { RoomLayoutSkeleton } from "@/components/Movie/RoomLayoutSkeleton.tsx"
 
 export default function App() {
   const { movies, loading: loadingMoviesData } = useMoviesList()
@@ -17,7 +18,6 @@ export default function App() {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <h1>Event Booking</h1>
         <p>Date: 20.06.2026</p>
       </header>
 
@@ -28,7 +28,7 @@ export default function App() {
           <MovieList movies={movies} onSelectShowtime={onSelectShowtime} />
         )}
 
-        {selectedShowtimeId && loadingSeatsData && <p>Loading seats data...</p>}
+        {selectedShowtimeId && loadingSeatsData && <RoomLayoutSkeleton />}
 
         {selectedShowtimeId && !loadingSeatsData && seats && (
           <RoomLayout roomName={seats.roomName} rows={seats.rows} onSelectSeat={onSelectSeat} />
