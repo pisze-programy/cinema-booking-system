@@ -1,4 +1,10 @@
-import { MovieListResponse, ShowtimeSeatsResponse } from "@/types/apiResponse"
+import {
+  MovieListResponse,
+  ShowTimeSeatsReservationBodyRequest,
+  ShowTimeSeatsReservationBodyResponse,
+  ShowtimeSeatsReservationResponse,
+  ShowtimeSeatsResponse,
+} from "@/types/apiResponse"
 
 const request = async <T>(method: string, path: string, body?: unknown): Promise<T> => {
   // TODO: Fix API URL override
@@ -23,5 +29,7 @@ export const cinemaApi = {
   getMovies: (date: string) => request<MovieListResponse[]>("GET", `movies?date=${date}`),
   getSeats: (showtimeId: string) => request<ShowtimeSeatsResponse>("GET", `showtimes/${showtimeId}/seats`),
   getSeatsReservations: (showtimeId: string) =>
-    request<ShowtimeSeatsResponse>("GET", `showtimes/${showtimeId}/reservations`),
+    request<ShowtimeSeatsReservationResponse[]>("GET", `showtimes/${showtimeId}/reservations`),
+  createSeatsReservations: (showtimeId: string, body: ShowTimeSeatsReservationBodyRequest) =>
+    request<ShowTimeSeatsReservationBodyResponse>("POST", `showtimes/${showtimeId}/reservations`, body),
 }

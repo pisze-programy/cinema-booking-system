@@ -33,7 +33,7 @@ Resources:
     Properties:
       StageName: !Ref Environment
       Cors:
-        AllowMethods: "'GET,OPTIONS'"
+        AllowMethods: "'GET,POST,OPTIONS'"
         AllowHeaders: "'Content-Type'"
         AllowOrigin: "'*'" # TODO, domain
 
@@ -70,7 +70,7 @@ Resources:
   GetShowtimeReservationsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: dist/functions/movies/get-reservations.handler
+      Handler: dist/functions/showtimes/get-reservations.handler
       CodeUri: .
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -81,6 +81,21 @@ Resources:
             RestApiId: !Ref BookingApi
             Path: /showtimes/{id}/reservations
             Method: GET
+
+  CreateReservationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/functions/showtimes/post-reservations.handler
+      CodeUri: .
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        SeatsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /showtimes/{id}/reservations
+            Method: POST
 
 Outputs:
   ApiUrl:

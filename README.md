@@ -7,3 +7,14 @@ Last update: 21.06.2026
 React, Typescript, Nodejs, SAM, PostgreSQL (RDS), SQS, S3
 
 ![Cinema Booking Demo](./docs/cinema-booking-demo.gif)
+
+___
+
+Well known issues:
+
+- Missing showtime_id validation and no time.date integration (System allowed reservations for invalid or past
+  showtime_id values)
+- No dynamic prices, fee
+- Limiting users to exactly one seat per transaction
+- Database overhead via GET Reservations polling: AWS AppSync integration missing
+- Hardcoded backend API URL frontend/utils/api.ts

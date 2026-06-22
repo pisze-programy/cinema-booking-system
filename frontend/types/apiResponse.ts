@@ -19,3 +19,18 @@ export interface ShowtimeSeatsResponse {
   roomName: string
   rows: RoomRow[]
 }
+
+export interface ShowtimeSeatsReservationResponse {
+  rowId: string
+  seatNum: number
+}
+
+export interface ShowTimeSeatsReservationBodyRequest {
+  rowId: string
+  seatNum: number
+}
+
+export interface ShowTimeSeatsReservationBodyResponse {
+  expiresAt: string
+  reservationId: string
+}

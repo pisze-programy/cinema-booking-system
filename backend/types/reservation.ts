@@ -1,4 +1,4 @@
-export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'EXPIRED'
+export type ReservationEventType = 'CREATED' | 'CONFIRMED' | 'EXPIRED'
 
 export interface Reservation {
     id: string
@@ -6,7 +6,13 @@ export interface Reservation {
     rowId: number
     seatNum: number
     userId: string
-    status: ReservationStatus
-    expiresAt: string
+    eventType: ReservationEventType
+    expiresAt?: string
     createdAt: string
+}
+
+export interface ReservationRequest {
+    showtimeId: string;
+    rowId: number;
+    seatNum: number;
 }
