@@ -8,6 +8,15 @@ React, Typescript, Nodejs, SAM, PostgreSQL (RDS), SQS, S3
 
 ![Cinema Booking Demo](./docs/cinema-booking-demo.gif)
 
+### Seat Reservation
+
+TODO: Description
+![Seat Reservation Demo](./docs/cinema-booking-seat-reservation-demo.jpeg)
+
+### Requirements / Flow
+
+TODO: Description
+
 ___
 
 Well known issues:
