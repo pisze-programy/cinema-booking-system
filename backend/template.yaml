@@ -97,6 +97,21 @@ Resources:
             Path: /showtimes/{id}/reservations
             Method: POST
 
+  InitPaymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/functions/showtimes/init-payment.handler
+      CodeUri: .
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        PaymentApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /showtimes/{id}/payment
+            Method: POST
+
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
