@@ -1,6 +1,14 @@
 ### work in progress
 
-Last update: 21.06.2026
+Last update: 23.06.2026
+
+### System Design
+
+![Cinema Booking Design](./docs/cinema-booking-design.jpg)
+
+### Requirements / Flow
+
+TODO: Description
 
 ### Cinema booking system design, focusing on real-time seat reservations
 
@@ -12,10 +20,6 @@ React, Typescript, Nodejs, SAM, PostgreSQL (RDS), SQS, S3
 
 TODO: Description
 ![Seat Reservation Demo](./docs/cinema-booking-seat-reservation-demo.jpeg)
-
-### Requirements / Flow
-
-TODO: Description
 
 ___
 
