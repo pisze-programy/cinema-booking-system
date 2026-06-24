@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { cinemaApi } from "@/utils/api.ts"
 import { ShowTimeSeatsReservationBodyRequest, ShowtimeSeatsReservationResponse } from "@/types/apiResponse.ts"
 
-const POOLING_TIME_INTERVAL = 10 * 1000
+const POOLING_TIME_INTERVAL = 50 * 1000
 
 export const useReservations = (selectedShowtimeId: string | null) => {
   const [reservations, setReservations] = useState<ShowtimeSeatsReservationResponse[]>([])

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Cinema Booking
+Description: Cinema Booking - Complete Event-Driven Architecture
 
 Parameters:
   Environment:
@@ -15,6 +15,7 @@ Parameters:
 
 Globals:
   Function:
+    Tracing: Active
     Runtime: nodejs22.x
     Timeout: 10
     MemorySize: 256
@@ -28,14 +29,61 @@ Globals:
         ENVIRONMENT: !Ref Environment
 
 Resources:
+  ReservationQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 60
+      RedrivePolicy:
+        maxReceiveCount: 3
+
+  NotificationQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 60
+
+  ReservationEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: reservation
+
   BookingApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Environment
+      MethodSettings:
+        - HttpMethod: '*'
+          ResourcePath: '/*'
+          ThrottlingBurstLimit: 100
+          ThrottlingRateLimit: 50
       Cors:
         AllowMethods: "'GET,POST,OPTIONS'"
         AllowHeaders: "'Content-Type'"
         AllowOrigin: "'*'" # TODO, domain
+
+  ReservationTimeoutStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        StartAt: WaitUntilExpired
+        States:
+          WaitUntilExpired:
+            Type: Wait
+            TimestampPath: "$.expiresAt"
+            Next: PublishExpiredEvent
+          PublishExpiredEvent:
+            Type: Task
+            Resource: "arn:aws:states:::events:putEvents"
+            Parameters:
+              Entries:
+                - Source: "cinema.reservations"
+                  DetailType: "ReservationExpired"
+                  EventBusName: !Ref ReservationEventBus
+                  Detail:
+                    reservationId.$: "$.reservationId"
+            End: true
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref ReservationEventBus
 
   GetListMoviesFunction:
     Type: AWS::Serverless::Function
@@ -87,8 +135,16 @@ Resources:
     Properties:
       Handler: dist/functions/showtimes/post-reservations.handler
       CodeUri: .
+      Environment:
+        Variables:
+          TIMEOUT_STATEMACHINE_ARN: !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${ReservationTimeoutStateMachine.Name}"
       Policies:
         - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action:
+                - states:StartExecution
+              Resource: !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${ReservationTimeoutStateMachine.Name}"
       Events:
         SeatsApi:
           Type: Api
@@ -119,6 +175,8 @@ Resources:
       CodeUri: .
       Policies:
         - AWSLambdaBasicExecutionRole
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref ReservationEventBus
       Events:
         PaymentApi:
           Type: Api
@@ -127,7 +185,70 @@ Resources:
             Path: /showtimes/{id}/payment/confirm
             Method: GET
 
+  ReservationWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/functions/showtimes/reservation-worker.handler
+      CodeUri: .
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - SQSPollerPolicy:
+            QueueName: !GetAtt ReservationQueue.QueueName
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: !GetAtt ReservationTimeoutStateMachine.Name
+
+
+  ReservationEventsRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref ReservationEventBus
+      EventPattern:
+        source:
+          - "cinema.reservations"
+          - "cinema.payments"
+        detail-type:
+          - "ReservationExpired"
+          - "PaymentSucceeded"
+          - "PaymentFailed"
+      Targets:
+        - Arn: !GetAtt ReservationQueue.Arn
+          Id: "ReservationQueueTarget"
+
+  ReservationQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref ReservationQueue
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt ReservationQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt ReservationEventsRule.Arn
+
+  ReservationQueueEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      EventSourceArn: !GetAtt ReservationQueue.Arn
+      FunctionName: !Ref ReservationWorkerFunction
+      Enabled: true
+
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
     Value: !Sub 'https://${BookingApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+  StateMachineArn:
+    Description: State Machine ARN
+    Value: !GetAtt ReservationTimeoutStateMachine.Arn
+  ReservationQueueUrl:
+    Description: SQS Queue URL for reservations
+    Value: !Ref ReservationQueue
+  ReservationQueueArn:
+    Description: SQS Queue ARN for reservations
+    Value: !GetAtt ReservationQueue.Arn

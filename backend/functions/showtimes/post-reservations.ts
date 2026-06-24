@@ -2,6 +2,9 @@ import {APIGatewayProxyEventV2, APIGatewayProxyResultV2} from "aws-lambda";
 import {randomUUID} from "crypto";
 import {dbService} from "@/database/client";
 import {ReservationRequest} from "@/types/reservation";
+import {SFNClient, StartExecutionCommand} from "@aws-sdk/client-sfn";
+
+const sfnClient = new SFNClient({});
 
 export const handler = async (
     event: APIGatewayProxyEventV2
@@ -75,10 +78,30 @@ export const handler = async (
             [reservationId, showtimeId, rowId, seatNum, expiresAt]
         );
 
+        const stateMachineArn = process.env.TIMEOUT_STATEMACHINE_ARN;
+
+        console.log('stateMachineArn', process.env.TIMEOUT_STATEMACHINE_ARN);
+
+        if (!stateMachineArn) {
+            throw new Error("TIMEOUT_STATEMACHINE_ARN environment variable is missing");
+        }
+
+        const inputPayload = {
+            reservationId,
+            expiresAt: expiresAt.toISOString()
+        };
+
+        const startCommand = new StartExecutionCommand({
+            stateMachineArn: stateMachineArn,
+            name: reservationId,
+            input: JSON.stringify(inputPayload)
+        });
+
+        await sfnClient.send(startCommand);
         await client.query("COMMIT");
 
         return {
-            statusCode: 201,
+            statusCode: 200,
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 reservationId,
@@ -87,9 +110,11 @@ export const handler = async (
         };
     } catch (error) {
         await client.query("ROLLBACK");
+        console.error(error);
+
         return {
             statusCode: 500,
-            body: JSON.stringify({message: "Internal Server Error"}),
+            body: JSON.stringify({message: "Internal Server Error", error}),
         };
     } finally {
         client.release();
