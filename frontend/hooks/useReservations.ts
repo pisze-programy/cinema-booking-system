@@ -7,6 +7,7 @@ const POOLING_TIME_INTERVAL = 10 * 1000
 export const useReservations = (selectedShowtimeId: string | null) => {
   const [reservations, setReservations] = useState<ShowtimeSeatsReservationResponse[]>([])
   const [loading, setLoading] = useState(true)
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
 
   const activeShowtimeIdRef = useRef(selectedShowtimeId)
 
@@ -58,11 +59,15 @@ export const useReservations = (selectedShowtimeId: string | null) => {
     }
 
     try {
-      await cinemaApi.createSeatsReservations(selectedShowtimeId, newReservation)
+      const { reservationId } = await cinemaApi.createSeatsReservations(selectedShowtimeId, newReservation)
+      const { paymentUrl } = await cinemaApi.createPayment(selectedShowtimeId, { reservationId })
 
       setReservations((prev) => [...prev, newReservation])
+      setPaymentUrl(`http://localhost:3000/${paymentUrl}`)
     } catch (e) {
-      console.error("CreateReservation failed", e)
+      console.error("Reservation failed", e)
+      setReservations((prev) => [...prev.filter((i) => i !== newReservation)])
+      setPaymentUrl(null)
     }
   }
 
@@ -70,5 +75,6 @@ export const useReservations = (selectedShowtimeId: string | null) => {
     loading,
     reservations,
     onReserveSeat,
+    paymentUrl,
   }
 }

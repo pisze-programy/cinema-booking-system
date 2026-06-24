@@ -1,5 +1,7 @@
 import {
   MovieListResponse,
+  ReservationPaymentBodyRequest,
+  ReservationPaymentBodyResponse,
   ShowTimeSeatsReservationBodyRequest,
   ShowTimeSeatsReservationBodyResponse,
   ShowtimeSeatsReservationResponse,
@@ -32,4 +34,6 @@ export const cinemaApi = {
     request<ShowtimeSeatsReservationResponse[]>("GET", `showtimes/${showtimeId}/reservations`),
   createSeatsReservations: (showtimeId: string, body: ShowTimeSeatsReservationBodyRequest) =>
     request<ShowTimeSeatsReservationBodyResponse>("POST", `showtimes/${showtimeId}/reservations`, body),
+  createPayment: (showtimeId: string, body: ReservationPaymentBodyRequest) =>
+    request<ReservationPaymentBodyResponse>("POST", `showtimes/${showtimeId}/payment`, body),
 }

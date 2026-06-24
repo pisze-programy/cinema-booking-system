@@ -34,3 +34,12 @@ export interface ShowTimeSeatsReservationBodyResponse {
   expiresAt: string
   reservationId: string
 }
+
+export interface ReservationPaymentBodyRequest {
+  reservationId: string
+}
+
+export interface ReservationPaymentBodyResponse {
+  reservationId: string
+  paymentUrl: string
+}

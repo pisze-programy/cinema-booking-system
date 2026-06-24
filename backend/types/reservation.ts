@@ -16,3 +16,7 @@ export interface ReservationRequest {
     rowId: number;
     seatNum: number;
 }
+
+export interface PaymentRequest {
+    reservationId: string
+}

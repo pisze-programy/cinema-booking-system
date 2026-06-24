@@ -112,6 +112,21 @@ Resources:
             Path: /showtimes/{id}/payment
             Method: POST
 
+  ConfirmPaymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/functions/showtimes/confirm-payment.handler
+      CodeUri: .
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        PaymentApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BookingApi
+            Path: /showtimes/{id}/payment/confirm
+            Method: GET
+
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL

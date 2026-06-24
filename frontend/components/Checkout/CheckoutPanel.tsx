@@ -2,6 +2,7 @@ import type { CSSProperties } from "react"
 import { RoomRow } from "@/types/apiResponse.ts"
 
 interface ReservationSummaryProps {
+  paymentUrl: string | null
   selectedRowId: string | null
   selectedSeatNum: number | null
   price: number
@@ -19,6 +20,7 @@ export const CheckoutPanel = ({
   onConfirm,
   onCancel,
   rows,
+  paymentUrl,
 }: ReservationSummaryProps) => {
   if (!selectedRowId || !selectedSeatNum) return null
 
@@ -59,14 +61,20 @@ export const CheckoutPanel = ({
         </div>
       </div>
 
-      <div style={styles.actions}>
-        <button style={styles.cancelBtn} onClick={handleCancel}>
-          Cancel
-        </button>
-        <button style={styles.confirmBtn} onClick={handleConfirm}>
-          Confirm and Pay
-        </button>
-      </div>
+      {paymentUrl ? (
+        <a target="_blank" href={paymentUrl}>
+          Confirm Payment {total} PLN
+        </a>
+      ) : (
+        <div style={styles.actions}>
+          <button style={styles.cancelBtn} onClick={handleCancel}>
+            Cancel
+          </button>
+          <button style={styles.confirmBtn} onClick={handleConfirm}>
+            Confirm and Pay
+          </button>
+        </div>
+      )}
     </div>
   )
 }

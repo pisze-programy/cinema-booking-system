@@ -19,7 +19,12 @@ export default function App() {
     selectedSeat,
     selectedRow,
   } = useSeatsForMovie()
-  const { reservations, loading: loadingSeatsReservations, onReserveSeat } = useReservations(selectedShowtimeId)
+  const {
+    reservations,
+    loading: loadingSeatsReservations,
+    onReserveSeat,
+    paymentUrl,
+  } = useReservations(selectedShowtimeId)
 
   useEffect(() => {
     if (loadingMoviesData) {
@@ -61,6 +66,7 @@ export default function App() {
               selectedSeatNum={selectedSeat}
               selectedRowId={selectedRow}
               onConfirm={onReserveSeat}
+              paymentUrl={paymentUrl}
             />
           </>
         )}
