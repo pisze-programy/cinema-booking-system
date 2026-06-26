@@ -29,17 +29,31 @@ Globals:
         ENVIRONMENT: !Ref Environment
 
 Resources:
+  NotificationDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+
+  ReservationDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+
   ReservationQueue:
     Type: AWS::SQS::Queue
     Properties:
       VisibilityTimeout: 60
       RedrivePolicy:
+        deadLetterTargetArn: !GetAtt ReservationDLQ.Arn
         maxReceiveCount: 3
 
   NotificationQueue:
     Type: AWS::SQS::Queue
     Properties:
       VisibilityTimeout: 60
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt NotificationDLQ.Arn
+        maxReceiveCount: 3
 
   ReservationEventBus:
     Type: AWS::Events::EventBus

@@ -31,5 +31,4 @@ Well known issues:
 - Limiting users to exactly one seat per transaction
 - Database overhead via GET Reservations polling: AWS AppSync integration missing
 - Hardcoded backend API URL frontend/utils/api.ts
-- No DLQ Implementation
 - AWS Secrets Manager
